@@ -1,0 +1,18 @@
+Scripts to generate and save a set of diffs for review.
+
+PREREQS
+
+	You need the python and python-tk packaes
+
+INSTALL
+
+	Run install.sh to install to ~/bin
+
+USAGE
+
+	# Generate some diffs and name them "foo"
+	$ make-review foo HEAD^^..HEAD
+	
+	# View the diffs
+	$ /home/eli/reviews/foo/diff.sh
+

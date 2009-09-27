@@ -1,0 +1,7 @@
+#!/bin/sh
+#
+# Script called by git diff for each file. Saves the the old and new
+# files, then logs their names.
+#
+cp $2 $5 $REVDIR
+echo "$(basename $2) , $(basename $5)" >> $REVIDX

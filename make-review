@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+# make-review <name> <diff options>
+#
+export REVROOT=~/reviews
+export REVDIR="$REVROOT/$1"
+export REVIDX="$REVDIR/files"
+export REVSCRIPT="$REVDIR/diff.sh"
+export DIFFCMD="tkdiff"
+
+if [ -e $REVDIR ]; then
+    echo "Review \"$1\" already exists."
+else
+    mkdir -p $REVDIR
+    shift
+    # generate diff files, file index, and the review script
+    GIT_EXTERNAL_DIFF=diffhook git diff $*
+    echo "#!/bin/sh" > $REVSCRIPT
+    echo "review-ui $DIFFCMD $REVDIR $REVIDX" >> $REVSCRIPT
+    chmod u+x $REVSCRIPT
+    echo $REVSCRIPT
+fi

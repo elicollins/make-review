@@ -1,0 +1,72 @@
+#!/usr/bin/env python
+#
+# review-ui <diff cmd> <diff dir> <diff index>
+#
+from Tkinter import *
+from os import system, kill, chdir
+from signal import SIGKILL
+from subprocess import Popen
+from sys import argv
+
+# Button click callback
+def callback(idx, key):
+    # xxx bring existing diffs to the front
+    buts[idx].config(relief=SUNKEN)
+    pids.append(Popen([DIFFCMD, key, filPair[key]]).pid)
+
+
+# Kill a the processes exec'd via button clicks
+def killAll():
+    try:
+        for pid in pids: kill(pid, SIGKILL)
+    except OSError:
+        pass  # the child may have exited
+    exit(0)
+
+
+# Populate filPair using the given file
+def loadFile(fileName):
+    def parseKeyVal(line, idx):
+        s = line.split(",")[idx].strip()
+        if s == "null":
+            s = "/dev/null"
+        return s
+
+    for line in file(fileName,"r"):
+        k = parseKeyVal(line, 0)
+        v = parseKeyVal(line, 1)
+        filPair[k] = v
+
+
+filPair = {}       # maps old file to new file
+pids = []          # children exec'd by clicking buttons
+buts = []
+root = Tk()
+
+DIFFCMD = argv[1]
+chdir(argv[2])     # button callback opens using rel paths
+loadFile(argv[3])
+
+# Create a button for each file pair
+cnt = 0
+for key in filPair.iterkeys():
+    if key == "/dev/null":
+        name = filPair[key]
+    else:
+        name = key
+    name = name.split("_")[1]
+    # xxx would like to capture b in the closure rather than
+    # have to save in buts. Unfortunately the tkinter widgets
+    # don't pass self to the callbacks.
+    b = Button(root, text=name, width=30,
+               command = lambda i=cnt, k=key: callback(i, k))
+    b.pack()
+    buts.append(b)
+    cnt = cnt + 1
+
+Button(root, text="exit", width=30, bg="red", fg="white", 
+       activebackground="red", activeforeground="yellow",
+       command=killAll).pack()
+
+root.mainloop()
+killAll()
