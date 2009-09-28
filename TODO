@@ -1,0 +1,5 @@
+
+Make directory renaming work (eg don't encode absolute paths in scripts)
+
+Clicking diff already opened should give that one focus
+
