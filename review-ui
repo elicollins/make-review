@@ -11,8 +11,11 @@ from sys import argv
 # Button click callback
 def callback(idx, key):
     # xxx bring existing diffs to the front
+    # xxx ignoring key
+    # xxx pass button ref in (weakref?)
     buts[idx].config(relief=SUNKEN)
-    pids.append(Popen([DIFFCMD, key, filPair[key]]).pid)
+    (k, v) = filPair[idx]
+    pids.append(Popen([DIFFCMD, k, v]).pid)
 
 
 # Kill a the processes exec'd via button clicks
@@ -35,10 +38,10 @@ def loadFile(fileName):
     for line in file(fileName,"r"):
         k = parseKeyVal(line, 0)
         v = parseKeyVal(line, 1)
-        filPair[k] = v
+        filPair.append((k,v))
 
 
-filPair = {}       # maps old file to new file
+filPair = []       # pairs of old and new files
 pids = []          # children exec'd by clicking buttons
 buts = []
 root = Tk()
@@ -49,18 +52,19 @@ loadFile(argv[3])
 
 # Create a button for each file pair
 cnt = 0
-for key in filPair.iterkeys():
+for (key, val) in filPair:
     if key == "/dev/null":
-        name = filPair[key]
+        name = val
     else:
         name = key
-    # generated file names are of form random_FileName
-    if -1 != name.find("_"):
-        name = name.split("_")[1]
+        # generated file names are of form random_FileName
+        # xxx assumes file names of this form, and only one underbar
+        if -1 != name.find("_"):
+            name = name.split("_")[1]
     # xxx would like to capture b in the closure rather than
     # have to save in buts. Unfortunately the tkinter widgets
     # don't pass self to the callbacks.
-    b = Button(root, text=name, width=30,
+    b = Button(root, text=name, width=30, 
                command = lambda i=cnt, k=key: callback(i, k))
     b.pack()
     buts.append(b)
@@ -69,6 +73,5 @@ for key in filPair.iterkeys():
 Button(root, text="exit", width=30, bg="red", fg="white", 
        activebackground="red", activeforeground="yellow",
        command=killAll).pack()
-
 root.mainloop()
 killAll()

@@ -4,4 +4,4 @@
 # files, then logs their names.
 #
 cp $2 $5 $REVDIR
-echo "$(basename $2) , $(basename $5)" >> $REVIDX
+echo "$(basename $2),$(basename $5)" >> $REVIDX
