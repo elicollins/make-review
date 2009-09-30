@@ -6,6 +6,7 @@ export REVROOT=~/reviews
 export REVDIR="$REVROOT/$1"
 export REVIDX="$REVDIR/files"
 export REVSCRIPT="$REVDIR/diff.sh"
+export PATCH="$REVDIR/$1.patch"
 export DIFFCMD="tkdiff"
 
 if [ -e $REVDIR ]; then
@@ -19,4 +20,6 @@ else
     echo "review-ui $DIFFCMD $REVDIR $REVIDX" >> $REVSCRIPT
     chmod u+x $REVSCRIPT
     echo $REVSCRIPT
+    # generate a patch
+    git diff --no-prefix $* > $PATCH
 fi

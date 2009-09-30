@@ -1,5 +1,6 @@
+TODO:
 
-Make directory renaming work (eg don't encode absolute paths in scripts)
+Renaming a directory after generating it breaks (use rel paths)
 
 Clicking diff already opened should give that one focus
 

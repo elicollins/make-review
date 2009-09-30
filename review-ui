@@ -54,7 +54,9 @@ for key in filPair.iterkeys():
         name = filPair[key]
     else:
         name = key
-    name = name.split("_")[1]
+    # generated file names are of form random_FileName
+    if -1 != name.find("_"):
+        name = name.split("_")[1]
     # xxx would like to capture b in the closure rather than
     # have to save in buts. Unfortunately the tkinter widgets
     # don't pass self to the callbacks.
