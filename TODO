@@ -1,6 +1,5 @@
 TODO:
-
-Renaming a directory after generating it breaks (use rel paths)
-
-Clicking diff already opened should give that one focus
-
+* Fix bashisms (dash)
+* Handle files with underbars in their name.
+* Renaming a directory after generating it breaks (use rel paths)
+* Clicking diff already opened should give that one focus

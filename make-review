@@ -3,11 +3,11 @@
 # make-review <name> <diff options>
 #
 export REVROOT=~/reviews
-export REVDIR="$REVROOT/$1"
-export REVIDX="$REVDIR/files"
-export REVSCRIPT="$REVDIR/diff.sh"
-export PATCH="$REVDIR/$1.patch"
-export DIFFCMD="tkdiff"
+export REVDIR=$REVROOT/$1
+export REVIDX=$REVDIR/files
+export REVSCRIPT=$REVDIR/diff.sh
+export PATCH=$REVDIR/$1.patch
+export DIFFCMD=tkdiff
 
 if [ -e $REVDIR ]; then
     echo "Review \"$1\" already exists."
