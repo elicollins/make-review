@@ -2,7 +2,7 @@
 #
 # make-review <name> <diff options>
 #
-export REVROOT=~/reviews
+export REVROOT=$HOME/reviews
 export REVDIR=$REVROOT/$1
 export REVIDX=$REVDIR/files
 export REVSCRIPT=$REVDIR/diff.sh
