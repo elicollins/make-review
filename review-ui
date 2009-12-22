@@ -10,12 +10,15 @@ from sys import argv
 
 # Button click callback
 def callback(idx, key):
-    # xxx bring existing diffs to the front
-    # xxx ignoring key
-    # xxx pass button ref in (weakref?)
+    # xxx Bring existing diffs to the front
+    # xxx Pass button ref in (weakref?)
     buts[idx].config(relief=SUNKEN)
     (k, v) = filPair[idx]
-    pids.append(Popen([DIFFCMD, k, v]).pid)
+    if DIFFCMD == "tkdiff":
+        args = [DIFFCMD, "-L"+v, k, v]
+    else:
+        args = [DIFFCMD, k, v]
+    pids.append(Popen(args).pid)
 
 
 # Kill a the processes exec'd via button clicks
@@ -23,7 +26,7 @@ def killAll():
     try:
         for pid in pids: kill(pid, SIGKILL)
     except OSError:
-        pass  # the child may have exited
+        pass  # The child may have exited
     exit(0)
 
 
@@ -41,13 +44,13 @@ def loadFile(fileName):
         filPair.append((k,v))
 
 
-filPair = []       # pairs of old and new files
-pids = []          # children exec'd by clicking buttons
+filPair = []       # Pairs of old and new files
+pids = []          # Children exec'd by clicking buttons
 buts = []
 root = Tk()
 
 DIFFCMD = argv[1]
-chdir(argv[2])     # button callback opens using rel paths
+chdir(argv[2])     # Button callback opens using rel paths
 loadFile(argv[3])
 
 # Create a button for each file pair
@@ -57,11 +60,11 @@ for (key, val) in filPair:
         name = val
     else:
         name = key
-        # generated file names are of form random_FileName
-        # xxx assumes file names of this form, and only one underbar
+        # Generated file names are of form random_FileName
+        # xxx Assumes file names of this form, and only one underbar
         if -1 != name.find("_"):
             name = name.split("_")[1]
-    # xxx would like to capture b in the closure rather than
+    # xxx Would like to capture b in the closure rather than
     # have to save in buts. Unfortunately the tkinter widgets
     # don't pass self to the callbacks.
     b = Button(root, text=name, width=30, 
