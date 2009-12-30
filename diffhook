@@ -3,5 +3,9 @@
 # Script called by git diff for each file. Saves the the old and new
 # files, then logs their names.
 #
+# The parameters are:
+# 	path oldfile oldhex oldmode newfile newhex newmode
+#
+
 cp $2 $5 $REVDIR
-echo "$(basename $2),$(basename $5)" >> $REVIDX
+echo "$(basename $2),$(basename $5),$1" >> $REVIDX

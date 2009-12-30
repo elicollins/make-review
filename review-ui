@@ -8,17 +8,23 @@ from signal import SIGKILL
 from subprocess import Popen
 from sys import argv
 
+import string
+
 # Button click callback
 def callback(idx, key):
     # xxx Bring existing diffs to the front
     # xxx Pass button ref in (weakref?)
     buts[idx].config(relief=SUNKEN)
-    (k, v) = filPair[idx]
+    (k, v, name) = filPair[idx]
     if DIFFCMD == "tkdiff":
-        args = [DIFFCMD, "-L"+v, k, v]
+        args = [DIFFCMD, "-L"+name, k, v]
     else:
         args = [DIFFCMD, k, v]
-    pids.append(Popen(args).pid)
+    try:
+        pids.append(Popen(args).pid)
+    except OSError, ex:
+        print >>sys.stderr, "Failed to execute:\n  '%s'\n%s" % \
+                  (string.join(args), ex)
 
 
 # Kill a the processes exec'd via button clicks
@@ -38,13 +44,15 @@ def loadFile(fileName):
             s = "/dev/null"
         return s
 
+    global filPair
     for line in file(fileName,"r"):
         k = parseKeyVal(line, 0)
         v = parseKeyVal(line, 1)
-        filPair.append((k,v))
+        path = parseKeyVal(line, 2)
+        filPair.append((k,v,path))
 
 
-filPair = []       # Pairs of old and new files
+filPair = []       # List of tuples of (old file, new file, file path)
 pids = []          # Children exec'd by clicking buttons
 buts = []
 root = Tk()
@@ -55,15 +63,7 @@ loadFile(argv[3])
 
 # Create a button for each file pair
 cnt = 0
-for (key, val) in filPair:
-    if key == "/dev/null":
-        name = val
-    else:
-        name = key
-        # Generated file names are of form random_FileName
-        # xxx Assumes file names of this form, and only one underbar
-        if -1 != name.find("_"):
-            name = name.split("_")[1]
+for (key, val, name) in filPair:
     # xxx Would like to capture b in the closure rather than
     # have to save in buts. Unfortunately the tkinter widgets
     # don't pass self to the callbacks.

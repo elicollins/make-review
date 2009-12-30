@@ -1,25 +1,89 @@
-#!/bin/sh
+#!/bin/bash
 #
 # make-review <name> <diff options>
 #
+
+script_name=`basename $0`
+
+usage()
+{
+    echo "Usage: $script_name [<options>] <review_name> [<git diff options>]"
+    echo "  Options:
+        -d <diff_prog>  : specify the diff program
+        -f              : force reuse review directory
+        -h              : print this message
+    "
+    exit 1
+}
+
+
+force=false
+
+while test $# -gt 0
+do
+    case "$1" in
+        --)     shift ; break ;;
+        -*)     option=$1 ; shift ;;
+        *)      break ;;
+    esac
+
+    # Options in alphabetical order
+    case "$option" in
+        -d)
+            if [ $# -eq 0 ]; then
+                echo "Argument to -d missing."
+                usage
+            fi
+            XDIFF_PROG=$1
+            shift
+            ;;
+        -f)
+            force=true
+            ;;
+        -h)
+            usage
+            ;;
+        -*)
+            echo "Bad option: $option"
+            usage
+            ;;
+    esac
+done
+
+# Expect at least the <review_name> argument
+if [ $# -eq 0 ]; then
+    usage
+fi
+
 export REVROOT=$HOME/reviews
 export REVDIR=$REVROOT/$1
 export REVIDX=$REVDIR/files
 export REVSCRIPT=$REVDIR/diff.sh
-export PATCH=$REVDIR/$1.patch
-export DIFFCMD=tkdiff
+export PATCH=$REVDIR/patch
+export DIFFCMD=${XDIFF_PROG:-tkdiff}
 
 if [ -e $REVDIR ]; then
-    echo "Review \"$1\" already exists."
-else
-    mkdir -p $REVDIR
-    shift
-    # generate diff files, file index, and the review script
-    GIT_EXTERNAL_DIFF=diffhook git diff $*
-    echo "#!/bin/sh" > $REVSCRIPT
-    echo "review-ui $DIFFCMD $REVDIR $REVIDX" >> $REVSCRIPT
-    chmod u+x $REVSCRIPT
-    echo $REVSCRIPT
-    # generate a patch
-    git diff --no-prefix $* > $PATCH
+    if $force ; then
+        \rm -f $REVSCRIPT $REVIDX $PATCH
+    else
+        echo "Review \"$1\" already exists."
+        exit 1
+    fi
 fi
+
+mkdir -p $REVDIR
+shift
+# generate diff files, file index, and the review script
+GIT_EXTERNAL_DIFF=diffhook git diff $*
+if [ ! -f $REVIDX ]; then
+    echo "No differences."
+    rmdir --ignore-fail-on-non-empty $REVDIR
+    exit 0
+fi
+echo "#!/bin/sh" > $REVSCRIPT
+echo "review-ui $DIFFCMD $REVDIR $REVIDX" >> $REVSCRIPT
+chmod u+x $REVSCRIPT
+echo $REVSCRIPT
+# generate a patch
+git diff --no-prefix $* > $PATCH
+exit 0
