@@ -67,14 +67,14 @@ for (key, val, name) in filPair:
     # xxx Would like to capture b in the closure rather than
     # have to save in buts. Unfortunately the tkinter widgets
     # don't pass self to the callbacks.
-    b = Button(root, text=name, width=30, 
+    b = Button(root, text=name, justify=LEFT, anchor=W, 
                command = lambda i=cnt, k=key: callback(i, k))
-    b.pack()
+    b.pack(fill=BOTH, expand=1)
     buts.append(b)
     cnt = cnt + 1
 
-Button(root, text="exit", width=30, bg="red", fg="white", 
+Button(root, text="exit", bg="red", fg="white", 
        activebackground="red", activeforeground="yellow",
-       command=killAll).pack()
+       command=killAll).pack(fill=BOTH, expand=1)
 root.mainloop()
 killAll()

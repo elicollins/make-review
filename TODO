@@ -1,6 +1,5 @@
 TODO:
-* Fix bashisms (dash)
-* Handle files with underbars in their name.
+* Make menu label be the name of the review
 * Renaming a directory after generating it breaks (use rel paths)
 * Clicking diff already opened should give that one focus
 * Bringing existing diff to the front when selecting a
