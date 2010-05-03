@@ -85,5 +85,5 @@ echo "review-ui $DIFFCMD $REVDIR $REVIDX" >> $REVSCRIPT
 chmod u+x $REVSCRIPT
 echo $REVSCRIPT
 # generate a patch
-git diff --no-prefix $* > $PATCH
+git diff $* > $PATCH
 exit 0
