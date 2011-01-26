@@ -25,15 +25,24 @@ from sys import argv
 import string
 
 # Button click callback
-def callback(idx, key):
+def callback(idx):
     # xxx Bring existing diffs to the front
     # xxx Pass button ref in (weakref?)
     buts[idx].config(relief=SUNKEN)
-    (k, v, name) = filPair[idx]
+    (old, new, path) = filTuples[idx]
+
+    lfile = old
+    rfile = path
+    # Diff against /dev/null
+    if old == "null":
+      lfile = "/dev/null"
+    if new == "null":
+      rfile = "/dev/null"
+
     if DIFFCMD == "tkdiff":
-        args = [DIFFCMD, "-L"+name, k, v]
+        args = [DIFFCMD, "-L"+path, lfile, rfile]
     else:
-        args = [DIFFCMD, k, v]
+        args = [DIFFCMD, lfile, rfile]
     try:
         pids.append(Popen(args).pid)
     except OSError, ex:
@@ -50,23 +59,27 @@ def killAll():
     exit(0)
 
 
-# Populate filPair using the given file
+# Populate filTuples using the given file
 def loadFile(fileName):
-    def parseKeyVal(line, idx):
-        s = line.split(",")[idx].strip()
-        if s == "null":
-            s = "/dev/null"
-        return s
+    def parseCSV(line, idx):
+        return line.split(",")[idx].strip()
 
-    global filPair
+    global filTuples
     for line in file(fileName,"r"):
-        k = parseKeyVal(line, 0)
-        v = parseKeyVal(line, 1)
-        path = parseKeyVal(line, 2)
-        filPair.append((k,v,path))
+        old = parseCSV(line, 0)
+        new = parseCSV(line, 1)
+        path = parseCSV(line, 2)
+        filTuples.append((old, new, path))
 
 
-filPair = []       # List of tuples of (old file, new file, file path)
+# filTuples contains lines of (old, new, path) tuples:
+# 1. old - file name of the file containing the previous version of
+#    the file, or "null" if the file does not exist (a new file).
+# 2. new - file name of the file that has the new version of the
+#    file, or "null" if the file does not exist (removing a file).
+# 3. path - the path of the file starting from the base of the
+#    source tree (eg foo/bar/baz.py).
+filTuples = []
 pids = []          # Children exec'd by clicking buttons
 buts = []
 root = Tk()
@@ -77,12 +90,12 @@ loadFile(argv[3])
 
 # Create a button for each file pair
 cnt = 0
-for (key, val, name) in filPair:
+for (old, new, path) in filTuples:
     # xxx Would like to capture b in the closure rather than
     # have to save in buts. Unfortunately the tkinter widgets
     # don't pass self to the callbacks.
-    b = Button(root, text=name, justify=LEFT, anchor=W, 
-               command = lambda i=cnt, k=key: callback(i, k))
+    b = Button(root, text=path, justify=LEFT, anchor=W,
+               command = lambda i=cnt: callback(i))
     b.pack(fill=BOTH, expand=1)
     buts.append(b)
     cnt = cnt + 1
