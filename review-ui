@@ -72,6 +72,17 @@ def loadFile(fileName):
         filTuples.append((old, new, path))
 
 
+# Return the given string, trimming out the middle if it's long
+def resizeText(path):
+    global BWIDTH
+    t = path
+    if len(t) > BWIDTH:
+        firstSeg = 20 # Show the first 20 chars
+        lastSeg = BWIDTH - firstSeg - len("...")
+        t = path[0:firstSeg]+"..."+path[len(t)-lastSeg:len(t)]
+    return t
+
+
 # filTuples contains lines of (old, new, path) tuples:
 # 1. old - file name of the file containing the previous version of
 #    the file, or "null" if the file does not exist (a new file).
@@ -83,10 +94,15 @@ filTuples = []
 pids = []          # Children exec'd by clicking buttons
 buts = []
 root = Tk()
+root.grid()
 
 DIFFCMD = argv[1]
 chdir(argv[2])     # Button callback opens using rel paths
 loadFile(argv[3])
+
+
+BWIDTH=70  # Buttons are 70 chars wide
+FWRAP=50   # Wrap the file listing ever 50 files
 
 # Create a button for each file pair
 cnt = 0
@@ -94,14 +110,21 @@ for (old, new, path) in filTuples:
     # xxx Would like to capture b in the closure rather than
     # have to save in buts. Unfortunately the tkinter widgets
     # don't pass self to the callbacks.
-    b = Button(root, text=path, justify=LEFT, anchor=W,
+    t = resizeText(path)
+    b = Button(root, text=t, justify=LEFT, anchor=W,
+               width=BWIDTH, padx=0, pady=0,
                command = lambda i=cnt: callback(i))
-    b.pack(fill=BOTH, expand=1)
+    b.grid(column=(cnt/FWRAP),row=(cnt%FWRAP))
     buts.append(b)
     cnt = cnt + 1
 
-Button(root, text="exit", bg="red", fg="white", 
-       activebackground="red", activeforeground="yellow",
-       command=killAll).pack(fill=BOTH, expand=1)
+b = Button(root, text="exit", justify=CENTER,
+           bg="red", fg="white",
+           width=BWIDTH, padx=0, pady=0,
+           activebackground="red", activeforeground="yellow",
+           command=killAll)
+b.grid(column=(cnt/FWRAP),row=(cnt%FWRAP))
+
+root.grid_columnconfigure(0,weight=1)
 root.mainloop()
 killAll()
