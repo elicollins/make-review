@@ -1,6 +1,6 @@
-TODO:
-* Make menu label be the name of the review
-* Renaming a directory after generating it breaks (use rel paths)
-* Clicking diff already opened should give that one focus
-* Bringing existing diff to the front when selecting a
-  diff that's already been opened.
+
+BUGS
+
+	Renaming a directory after generating it breaks (use rel paths)
+	Clicking diff already opened should give that diff focus
+	The menu label should have the name of the review

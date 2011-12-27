@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -13,4 +13,14 @@
 #  limitations under the License.
 #
 
-cp diffhook  make-review review-ui ~/bin
+#
+# Simple sample script to generate/update a diff and display it.
+#
+NAME=$(basename `pwd`)
+DIR=$HOME/reviews/$NAME
+DIFF=origin/trunk
+if [ -d $DIR ]; then
+  rm -rf $DIR
+fi
+make-review $NAME $DIFF
+$DIR/diff.sh

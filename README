@@ -2,17 +2,22 @@ Scripts to generate and save a set of diffs for review.
 
 PREREQS
 
-	You need the python and python-tk packaes
+	The python and python-tk packages.
 
 INSTALL
 
-	Run install.sh to install to ~/bin
+	Add the files in bin/* to your path.
 
 USAGE
 
-	# Generate some diffs and name them "foo"
+	Generate some diffs using a git diff expression that's evaluated
+	against the current repo and name them "foo"..
+
 	$ make-review foo HEAD^^..HEAD
 	
-	# View the diffs
-	$ /home/eli/reviews/foo/diff.sh
+	View the diffs by name..
+
+	$ $HOME/reviews/foo/diff.sh
+
+	See update-diffs.sh for an example.
 
