@@ -21,10 +21,14 @@
 # 	path oldfile oldhex oldmode newfile newhex newmode
 #
 
-cp $2 $REVDIR
-if [ "$5" != "/dev/null" ]
+path=$1
+oldfile=$2
+newfile=$5
+
+cp $oldfile $REVDIR
+if [ "$newfile" != "/dev/null" ]
 then
-  mkdir -p $REVDIR/$(dirname $5)
-  cp $5 $REVDIR/$(dirname $5)
+  mkdir -p $REVDIR/$(dirname $newfile)
+  cp $newfile $REVDIR/$(dirname $newfile)
 fi
-echo "$(basename $2),$(basename $5),$1" >> $REVIDX
+echo "$(basename $oldfile),$(basename $newfile),$path" >> $REVIDX
